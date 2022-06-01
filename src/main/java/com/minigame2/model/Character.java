@@ -11,7 +11,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 @Entity
 @Table(name="CHARACTER")
-public class Character implements Serializable {
+public class Character {
 	@Id
 	@GeneratedValue(strategy= GenerationType.AUTO)
 	private int id;
@@ -20,7 +20,7 @@ public class Character implements Serializable {
 	private int life;
 	private int points;
 	private int level;
-	@OneToOne(mappedBy="character",fetch= FetchType.EAGER)
+	@OneToOne(mappedBy="character")
 	private GameRoom location = new GameRoom();
 	@Transient
 	private List<Item> inventory;

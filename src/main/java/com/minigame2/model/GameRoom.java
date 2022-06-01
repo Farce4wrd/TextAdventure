@@ -1,7 +1,6 @@
 package com.minigame2.model;
 
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,15 +15,10 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
-
 @Entity
 @Table(name="ROOM")
 
-public class GameRoom implements Serializable {
+public class GameRoom{
 
 	@Id
 	@GeneratedValue(strategy= GenerationType.AUTO)
@@ -32,16 +26,17 @@ public class GameRoom implements Serializable {
 	private String name;
 	private String description;
 	private String hasvisited;
-	@OneToMany(mappedBy="room",fetch = FetchType.EAGER,cascade=CascadeType.PERSIST)
-	@Fetch(FetchMode.SELECT)
+	
+	@OneToMany(mappedBy="room",cascade = CascadeType.PERSIST, orphanRemoval = true)
 	private List<Item> items;
-	@OneToMany(mappedBy="room", fetch= FetchType.EAGER, cascade=CascadeType.ALL)
-	@Fetch(FetchMode.SELECT)
+	
+	@OneToMany(mappedBy="room", fetch= FetchType.EAGER)
 	private List<Exit> exits = new ArrayList<>();
-	@OneToMany(mappedBy="room", cascade=CascadeType.ALL)
-	@LazyCollection(LazyCollectionOption.FALSE)
+	
+	@OneToMany(mappedBy="room")
 	private List<Monster> monsters;
-	@OneToOne(cascade=CascadeType.PERSIST)
+	
+	@OneToOne(cascade=CascadeType.ALL)
 	@JoinColumn(name="character_id")
 	private Character character;
 	
@@ -52,11 +47,6 @@ public class GameRoom implements Serializable {
 	 */
 	public GameRoom() {
 		
-	}
-	
-	//Constructor
-	public GameRoom(int Id) {
-		this.id = Id;
 	}
 	
 	/**Major GameRoom Constructor
@@ -74,8 +64,6 @@ public class GameRoom implements Serializable {
 		this.description = description;
 		this.hasvisited = hasVisited;
 		this.items = items;
-	//	this.exits = exits;
-//		this.monsters=monsters;
 	}
 	/**
 	 * @return the id
@@ -83,12 +71,7 @@ public class GameRoom implements Serializable {
 	public int getId() {
 		return id;
 	}
-	/**
-	 * @param id the id to set
-	 */
-	public void setId(int id) {
-		this.id = id;
-	}
+
 	/**
 	 * @return the name
 	 */
@@ -107,12 +90,7 @@ public class GameRoom implements Serializable {
 	public String getDescription() {
 		return description;
 	}
-	/**
-	 * @param description the description to set
-	 */
-	public void setDescription(String description) {
-		this.description = description;
-	}
+
 	/**
 	 * @return the hasVisited
 	 */
@@ -143,19 +121,12 @@ public class GameRoom implements Serializable {
 	 * void
 	 */
 	public void removeItem(Item item) {
-//		this.items.forEach(it ->{
-//			if(it.getName().equals(item.getName())) {
-//				this.items.remove(it);
-//			}
-//		});
 		for(int i = 0; i<this.items.size(); i++) {
 			Item it = items.get(i);
 			if(it.getName().equals(item.getName())) {
 				this.items.remove(it);
 			}
 		}
-		
-	
 	}
 	
 	/**Returns all items inside a room
@@ -195,10 +166,8 @@ public class GameRoom implements Serializable {
 	
 	@Override
 	public String toString() {
-
-		return "\n GameRoom \n id=" + getId() + "\n name=" + getName() + "\n description=" + getDescription() + "\n hasvisited=" + hasvisited
-				+ "\n items=" + getItems() + "\n character=" + character + "\n monsters=" + getMonsters() + "\n exists=" + getExits() + "\n";
-
+		return "GameRoom [id=" + id + ", name=" + name + ", description=" + description + ", hasvisited=" + hasvisited
+				+ ", items=" + items + ", character=" + character + "]";
 	}
 
 	public List<Monster> getMonsters() {

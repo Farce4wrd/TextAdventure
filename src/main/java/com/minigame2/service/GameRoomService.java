@@ -22,7 +22,7 @@ public class GameRoomService {
 		this.gameRoomRepository = repo;
 	}
 	
-	private ArrayList<GameRoom> gameRooms = new ArrayList<GameRoom>();
+	
 	
 	/**Creates the room object
 	 * 
@@ -35,101 +35,31 @@ public class GameRoomService {
 	 *
 	 * void
 	 */
-//	public void createRoom(int id, String name, String description, boolean hasVisited, ArrayList<Item> items, ArrayList<Exit> exits) {
-//		GameRoom room = new GameRoom(id, name, description, hasVisited, items, exits);
-//		this.gameRooms.add(room);
-//		
-//	}
-//	
-	//Adds rooom to the database
+
+	//Adds room to the database
 	public GameRoom addRoom(GameRoom room) {
 		return gameRoomRepository.save(room);
 	}
 	//retrieves rooms from the database
 	public List<GameRoom> getRooms(){
-		List<GameRoom> rooms = new ArrayList<GameRoom>();
-		for(GameRoom room: this.gameRoomRepository.findAll()) {
-			rooms.add(room);
-		}
-		return rooms;
+		return this.gameRoomRepository.findAll();
 	}
+	//deletes room from the database
 	public void deleteRoom(GameRoom room) {
 		this.gameRoomRepository.delete(room);
 	}
-	
+	//gets room based on id (primary key)
 	public GameRoom getRoom(int id)
 	{
 		return this.gameRoomRepository.findById(id);
 	}
 	
-	public List<GameRoom> getRoomWItems(){
-		return this.gameRoomRepository.retrieveAll();
-	}
+	//gets room with item loaded
 	public GameRoom getRoomWithItem(int id) {
-		return this.gameRoomRepository.findGameRoomById(id);
+		return this.gameRoomRepository.findRoomByitems(id);
 	}
 	
-//	public void removeItems(Item item) {
-//		GameRoom room = this.gameRoomRepository.findByItem(0)
-//	}
-	/**Retrieve all the rooms
-	 * 
-	 * Method: 
-	 *
-	 * void
-	 */
-//	public void listAllRooms() {
-//		for(GameRoom room: gameRooms) {
-//			System.out.println(room);
-//		}
-//	}
-	
-	/**code to get the rooms created in an arraylist
-	 * 
-	 * Method: @return
-	 *
-	 * ArrayList<GameRoom>
-	 */
-	public ArrayList<GameRoom> getRoomss() {
-		return this.gameRooms;
-	}
-	
-	/**Code to get room exit directions based on the room id
-	 * 
-	 * Method: @param roomId
-	 * Method: @return
-	 * Method: @throws GameDataException
-	 *
-	 * ArrayList<String>
-	 */
-//	public ArrayList<String> getRoomDirection(int roomId) throws GameDataException{
-//		ArrayList<String> roomDirections = new ArrayList<String>();
-//		for(GameRoom room: gameRooms) {
-//			if(room.getId() == roomId) {
-//				roomDirections = room.getExits();
-//			}
-//		}
-//		return roomDirections;
-//	}
-	/**Code gets the exit id that links to other rooms
-	 * 
-	 * Method: @param room
-	 * Method: @param direction
-	 * Method: @return
-	 * Method: @throws GameDataException
-	 *
-	 * int
-	 */
-//	public int getNextRoomId(GameRoom room, String direction) throws GameDataException {
-//		int result = 0;
-//		for(Exit ex: room.getAllExitObject()) {
-//			if(ex.getDirection().equals(direction)) {
-//				result = ex.getRoomId();
-//			}
-//		}
-//		return result;
-//		
-//	}
+
 	
 	/**Inform the user the room has been visited
 	 * 
@@ -189,10 +119,7 @@ public class GameRoomService {
 	 *
 	 * ArrayList<Item>
 	 */
-//	public ArrayList<Item> getItemFromRoom(GameRoom room) {
-//		return room.getItems();
-//	}
-	
+
 	
 
 	

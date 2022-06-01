@@ -9,16 +9,12 @@ import java.util.List;
 
 @Repository
 public interface GameRoomRepository extends JpaRepository<GameRoom, Integer>{
-	public List<GameRoom> findByid(Integer id);
+	
 	GameRoom findByitems(Integer item);
 	
-	@Query("SELECT DISTINCT roo FROM GameRoom roo JOIN FETCH roo.items items")
-	List<GameRoom> retrieveAll();
-	GameRoom findGameRoomById(int id);
-	
+	@Query("SELECT roo FROM GameRoom roo LEFT JOIN FETCH roo.items items WHERE roo.id = ?1")
+	GameRoom findRoomByitems(int id);
 	
 	GameRoom findById(int id);
-	
-	GameRoom findByItems(int id);
 	
 }

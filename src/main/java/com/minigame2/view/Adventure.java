@@ -76,6 +76,7 @@ public class Adventure extends Application {
 		commandList.put("seeexits", new Command("See Exits -", "Show list of exits.", this.grc::tester));
 		commandList.put("go", new Command("Go -", "Moves to EAST or WEST or NORTH or SOUTH (example: go > east).", () ->moveCommand(direction)));
 		commandList.put("pickup", new Command("Pick Up -", "Picks up any item (example: pickup > bandage).", () ->pick(pickupItem)));
+		commandList.put("drop", new Command("Drop -", "Drops any item from inventory (example: drop > bandage).", () ->drop(pickupItem)));
 		//Need a method to show room currently in, list of items in room, exits in the room.
 		//May also display status of character in the method above (hp, inventory, e.t.c)
 	}
@@ -109,18 +110,22 @@ public class Adventure extends Application {
 		println(holdtheline);
 	}
 	
-	public static String a = "li";
-	
+	//pick up an item from room into character inventory
 	private void pick(String item) {
 		String result = grc.pickup(chara, item);
 		println(result);
 	}
-	
+	//drops item back into current room
+	private void drop(String item) {
+		String result = grc.drop(chara, item);
+		println(result);
+	}
+	//responsible for room-room movement
 	private void moveCommand(String direction) {
 		String result = grc.move(chara, direction);
 		println(result);
 	}
-
+	//responsible for giving instruction manual
 	private void runHelp() {
 		commandList.forEach((name, command) ->{
 			println(command.getName()+ " " +command.getDescription());

@@ -1,11 +1,16 @@
 package com.minigame2.model;
 
-import javax.persistence.*;
-import java.io.Serializable;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 @Entity
 @Table(name="ITEM", schema="ITEM")
-public class Item implements Serializable {
+public class Item {
 	@Id
     @GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer Id;
@@ -19,25 +24,25 @@ public class Item implements Serializable {
 	@ManyToOne
 	@JoinColumn(name="items_id")
 	private GameRoom room;
-	
+
 	public Item() {
-		
+
 	}
-	
+
 	public Item(String name, String descrip, String variety, String monsterType) {
 		this.name = name;
 		this.description= descrip;
 		this.variety = variety;
 		this.monstertype = monsterType;
 	}
-	
+
 	public Item(String name, String descrip, String variety) {
 		this.name= name;
 		this.description = descrip;
 		this.variety = variety;
 	}
-	
-	
+
+
 	/**
 	 * @return the id
 	 */

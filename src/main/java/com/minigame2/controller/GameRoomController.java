@@ -167,49 +167,33 @@ public class GameRoomController {
 	 * 
 	 * Method: @param Character character
 	 * Method: Item item
+	 *  
 	 */
-	
-	public String pickup(Character character, String item)
-	{
-		List<Item> characterInventory = character.getInventory();
-		
-		GameRoom location = character.getLocation();         //got through serializable
-		GameRoom location01 = this.gameRoomService.getRoom(location.getId());
-		//System.out.println(location01.getItems());
-		//This holds all items attached to a room
-		//GameRoom presentRoom = this.gameRoomService.getRoom(location.getId());
-		
-		List<Item> roomInventory = this.itemService.getItemsById(location);  
-		System.out.println("The test");
-		roomInventory.forEach(itema ->{
-			
-			System.out.println(itema);
-		});
-		//Item roomInventory_01= this.itemService.getItemsById(location.getId());
-		Boolean isFound = false;
-		for(Item itemToFind : roomInventory) {
-			if(itemToFind.getName().equalsIgnoreCase(item)) {
-				isFound = true;
-				characterInventory.add(itemToFind);  //add item to character's inventory
-				character.setInventory(characterInventory);
-				
-				
-				//roomInventory changed
-				location.removeItem(itemToFind); //removes room item from specific room
-				
-				//characterService.characterSave(character); //updates the character in the db with new item
-				this.gameRoomService.addRoom(location); 
-				 //saves state of the room to db
-				String res =itemToFind.getName() + " has been added to your inventory!\n";
-				
-				return res;
+	public String pickup(Character character, String item) {
+		//gets room of the character loaded with items
+		GameRoom location;
+		try {
+			location = this.gameRoomService.getRoomWithItem(character.getLocation().getId());
+			List<Item> itemsFound = location.getItems();
+			boolean isFound = false;
+			for(Item it: itemsFound) {
+				if(it.getName().equalsIgnoreCase(item)) {
+					isFound = true;
+					character.getInventory().add(it); //add the item to character's inventory
+					location.removeItem(it);
+					this.gameRoomService.addRoom(location);
+					String res =it.getName() + " has been added to your inventory!\n";	
+					return res;
+				}
 			}
+			if(isFound == false) {
+				return "Invalid option. " + item + " is not in the " + location.getName();
+			}
+		} catch (NullPointerException e) {
+			return "Cannot find that item within this room";
 		}
-		if(isFound == false) {
-			return "Invalid option. " + item + " is not in the " + location.getName();
-		}
+		
 		return "\n";
-
 	}
 	
 	/**Drop item in a room
@@ -219,25 +203,24 @@ public class GameRoomController {
 	 * 
 	 */
 	
-//	public String drop(Character character, Item item)
-//	{
-//		ArrayList<Item> characterInventory = character.getInventory();
-//		GameRoom location = character.getLocation();
-//		
-//		if(characterInventory.contains(item))
-//		{
-//			location.getItems().add(item);
-//			characterInventory.remove(item);
-//			characterService.characterSave(character);
-//			return item.getName() + " has been added to the " + location.getName() + "!\n";
-//		}
-//		else
-//		{
-//			return "Invalid option. " + item.getName() + " is not in your inventory. \n";
-//		}
-//	
-//	}
-//	
+	public String drop(Character character, String item)
+	{
+		GameRoom location = this.gameRoomService.getRoomWithItem(character.getLocation().getId());
+		List<Item> characterInventory = character.getInventory();
+		boolean isFound = false;
+		for(Item piece: characterInventory) {
+			if(piece.getName().equalsIgnoreCase(item)) {
+				isFound = true;
+				location.addItem(piece); //add item to the current room
+				characterInventory.remove(piece);
+				characterService.characterSave(character); //save the character
+				return item+ " has been added to the " + location.getName() + "!\n";
+			}
+		}
+		return isFound==true? "":"Invalid option. " + item + " is not in your inventory. \n";
+	
+	}
+	
 	
 	/**To get items within a room for game view class
 	 * 
