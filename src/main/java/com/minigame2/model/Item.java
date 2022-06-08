@@ -9,10 +9,10 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name="ITEM", schema="ITEM")
+@Table(name="ITEM")
 public class Item {
 	@Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer Id;
 	private String name;
 	private String description;
@@ -36,11 +36,6 @@ public class Item {
 		this.monstertype = monsterType;
 	}
 
-	public Item(String name, String descrip, String variety) {
-		this.name= name;
-		this.description = descrip;
-		this.variety = variety;
-	}
 
 
 	/**

@@ -22,8 +22,7 @@ public class GameRoomController {
 	private CharacterService characterService;
 	@Autowired
 	private ItemService itemService;
-	@Autowired
-	private Player player;
+
 	
 	
 	@Autowired
@@ -39,15 +38,16 @@ public class GameRoomController {
 		this.characterService = characterService;
 		this.gameRoomService = gameRoomService;
 		this.itemService = itemService;
-		this.player = player;
+	
 		//ControllerStart();
 	}
 	
 
 	//////Pre-cursor for the UI
 	public Character createCharacterAtBeginning(String name) {
-		GameRoom location = this.gameRoomService.getRoom(1);
-		Character chara = new Character(name,location,50,3,1,1);
+		GameRoom location = this.gameRoomService.getRoom(1); //state
+		Character chara = new Character(name,50,3,1,1);
+		chara.setLocation(location);
 		this.characterService.characterSave(chara);
 		return chara;
 		
@@ -60,42 +60,42 @@ public class GameRoomController {
 	 * Method: @param Character character
 	 * 
 	 */
-	public String combat(Weapon weapon, Monster monster, Character character)
-	{
-		int monsterHp = monster.getHp();
-		Random rand = new Random();
-		int monsterDamage = rand.nextInt(monster.getDamage());
-		String monsterType = monster.getVariety();
-		
-		int playerHp = character.getHp();
-		int weaponDamage = Integer.parseInt(weapon.getDamage());
-		String weaponType = weapon.getVariety();
-		
-		while(monsterHp > 0)
-		{
-			if(weaponType.equalsIgnoreCase(monsterType))
-			{
-				character.setHp(playerHp - monsterDamage);
-				monster.setHp(monsterHp - weaponDamage);
-				return "Your hp: " + playerHp + "\nMonster hp: " + monsterHp;
-			}
-			else
-			{
-				character.setHp(playerHp - monsterDamage);
-				return "Your hp: " + playerHp + "\nMonster hp: " + monsterHp + "\nWrong weapon type! You did not do any damage";
-			}
-		}
-		if(monsterHp <= 0)
-		{
-			
-			return monster.getName() + " has been defeated!";
-		}
-		else
-		{
-			return "\n";
-		}
-	}
-	
+//	public String combat(Weapon weapon, Monster monster, Character character)
+//	{
+//		int monsterHp = monster.getHp();
+//		Random rand = new Random();
+//		int monsterDamage = rand.nextInt(monster.getDamage());
+//		String monsterType = monster.getVariety();
+//		
+//		int playerHp = character.getHp();
+//		int weaponDamage = Integer.parseInt(weapon.getDamage());
+//		String weaponType = weapon.getVariety();
+//		
+//		while(monsterHp > 0)
+//		{
+//			if(weaponType.equalsIgnoreCase(monsterType))
+//			{
+//				character.setHp(playerHp - monsterDamage);
+//				monster.setHp(monsterHp - weaponDamage);
+//				return "Your hp: " + playerHp + "\nMonster hp: " + monsterHp;
+//			}
+//			else
+//			{
+//				character.setHp(playerHp - monsterDamage);
+//				return "Your hp: " + playerHp + "\nMonster hp: " + monsterHp + "\nWrong weapon type! You did not do any damage";
+//			}
+//		}
+//		if(monsterHp <= 0)
+//		{
+//			
+//			return monster.getName() + " has been defeated!";
+//		}
+//		else
+//		{
+//			return "\n";
+//		}
+//	}
+//	
 	/**Player movement method
 	 * 
 	 * Method: @param GameRoom room
@@ -125,17 +125,43 @@ public class GameRoomController {
 		return character.getLocation().getDescription();
 		//Change the UI of map to match the player location
 	}
-	
-	public String tester()
-	{
-		List<String> exits = this.gameRoomService.getRoom(2).getExits();
-		String result = ""+exits.size();
-		
-//		for(String e: exits)
-//		{
-//			result+=e;
-//		}
-		return result;
+
+	/**
+	 *
+	 * @param character
+	 * @return list of items within a room
+	 */
+	public List<String> inspectRoomItems(Character character){
+		List<String> roomItems = new ArrayList<String>();
+		GameRoom room = gameRoomService.getRoomWithItem(character.getLocation().getId());
+		for(Item item: room.getItems()){
+			roomItems.add(item.toString());
+		}
+		return roomItems;
+	}
+
+	 //Tester method for looking through any room with item
+	 public List<String> checkAnyRoomItem(Character character){
+		 List<String> roomItems = new ArrayList<String>();
+		 GameRoom room = gameRoomService.getRoomWithItem(17);
+		 for(Item item: room.getItems()){
+			 roomItems.add(item.toString());
+		 }
+		 return roomItems;
+	 }
+
+	public String useItem(Character character, String item){
+		List<Item> inventory = character.getInventory();
+		for(Item piece: inventory){
+			switch (piece.getVariety()){
+				case "Consummable":
+					//remove it from the database/character
+					character.setHp(character.getHp()+15);
+					break;
+				case ""
+
+			}
+		}
 	}
 	
 	/**Upgrade weapon 
@@ -182,6 +208,7 @@ public class GameRoomController {
 					character.getInventory().add(it); //add the item to character's inventory
 					location.removeItem(it);
 					this.gameRoomService.addRoom(location);
+					this.characterService.characterSave(character);
 					String res =it.getName() + " has been added to your inventory!\n";	
 					return res;
 				}
@@ -205,129 +232,26 @@ public class GameRoomController {
 	
 	public String drop(Character character, String item)
 	{
-		GameRoom location = this.gameRoomService.getRoomWithItem(character.getLocation().getId());
-		List<Item> characterInventory = character.getInventory();
 		boolean isFound = false;
-		for(Item piece: characterInventory) {
-			if(piece.getName().equalsIgnoreCase(item)) {
-				isFound = true;
-				location.addItem(piece); //add item to the current room
-				characterInventory.remove(piece);
-				characterService.characterSave(character); //save the character
-				return item+ " has been added to the " + location.getName() + "!\n";
+		try {
+			GameRoom location = this.gameRoomService.getRoomWithItem(character.getLocation().getId());
+			List<Item> characterInventory = character.getInventory();
+			for(Item piece: characterInventory) {
+				if(piece.getName().equalsIgnoreCase(item)) {
+					isFound = true;
+					location.addItem(piece); //add item to the current room
+					characterInventory.remove(piece);
+
+					characterService.characterSave(character); //save the character
+					boolean result = this.gameRoomService.dropItemInRoom(location.getId(), piece);
+					return item+ " has been added to the " + location.getName() + "!\n";
+				}
 			}
+		} catch (Exception e) {
+			throw new RuntimeException(e);
 		}
-		return isFound==true? "":"Invalid option. " + item + " is not in your inventory. \n";
+		return isFound ? "":"Invalid option. " + item + " is not in your inventory. \n";
 	
 	}
-	
-	
-	/**To get items within a room for game view class
-	 * 
-	 * Method: @param room
-	 *
-	 * void
-	 */
-//	public void getItem(GameRoom room) {
-//		ArrayList<Item> items = gameRoomService.getItemFromRoom(room);
-//		if(items!=null) {
-//			for(Item item: items) {
-//				System.out.println("Oh! There's something here..");
-//				System.out.println(item.getName());
-//			}
-//		}else {
-//			System.out.println("No items here");
-//		}
-//		
-//	}
-	
-	/**Checks each user input for changes to item or other things
-	 * 
-	 * Method: @param room
-	 * Method: @param playerChoice
-	 * Method: @return
-	 * Method: @throws GameDataException
-	 *
-	 * boolean
-	 */
-	public boolean verify(GameRoom room, String playerChoice) throws GameDataException {
-		boolean result = false;
-		//for user to respond to item/
-		if(playerChoice.contains("remove")) {
-			boolean itemFound = false;
-			ArrayList<Item> items = player.getBackpack();
-			for(Item it: items) {
-				if(playerChoice.equalsIgnoreCase("remove " +it.getName())) {
-					itemFound = true;
-					//dropItem(it, room);
-					break;
-				}
-			}
-			if(itemFound == false) {
-				throw new GameDataException("Cant find item in backpack");
-			}
-			result= true;
-		}
-		
-		
-		//looks into stored items within current room
-		if(playerChoice.contains("get")) {
-			boolean itemInRoom = false;
-			for(Item it: room.getItems()) {
-				if(playerChoice.equalsIgnoreCase("get " +it.getName())) {
-					itemInRoom = true;
-					player.addItemToBackpack(it);
-					//gameRoomService.removeItemFromRoom(it, room);	//to remove item from room
-					break;
-				}
-			}
-			if(itemInRoom == false) {
-				System.out.println("Item can not be found in this room.");
-				return true;
-				//throw new GameDataException("Item can not be found in this room.");
-			}
-			result = true;
-		}
-		
-		//displays the current room's description, exit and items (if present)
-		if(playerChoice.equalsIgnoreCase("look")) {
-			System.out.println("Room description: "+ room.getDescription());
-//			System.out.println("Exits: "+ gameRoomService.getRoomDirection(room.getId()));
-//			System.out.println("Items: "+ gameRoomService.getItemFromRoom(room));
-			return true;
-			
-		}
-		
-		//checks for inventory in backpack
-		if(playerChoice.equalsIgnoreCase("backpack")) {
-			ArrayList<Item> inventory = player.getBackpack();
-			if(inventory.isEmpty()==true) {
-				System.out.println("There's nothing in your backpack");
-			}else {
-				for(Item item: inventory) {
-					System.out.println(item.getName() + " is inside your backpack");
-				}
-			}
-			result = true;
-		}
-		
-		//if user wants to inspect an item
-		if(playerChoice.contains("inspect")) {
-			boolean itemInRoom = false;
-			for(Item it: room.getItems()) {
-				if(playerChoice.equalsIgnoreCase("inspect " +it.getName())) {
-					itemInRoom = true;
-					//itemService.inspect(it);
-				}
-			}
-			if(itemInRoom == false) {
-				//throw new GameDataException("Sorry no item in this room to inspect");
-				System.out.println("Sorry, no item in this room to inspect");
-				return true;
-			}
-			result = true;
-			
-		}
-		return result; //signifies we didnt do anything in room
-	}
+
 }

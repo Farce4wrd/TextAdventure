@@ -4,40 +4,34 @@ package com.minigame2.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
-@Table(name="ROOM")
+@Table(name = "ROOM")
+@NamedQueries({
+		@NamedQuery(name = "GameRoom.countBy", query = "select count(g) from GameRoom g")
+})
 
-public class GameRoom{
+public class GameRoom {
 
 	@Id
-	@GeneratedValue(strategy= GenerationType.AUTO)
+	@GeneratedValue(strategy= GenerationType.IDENTITY)
 	private int id;
 	private String name;
+	@Lob
 	private String description;
 	private String hasvisited;
 	
-	@OneToMany(mappedBy="room",cascade = CascadeType.PERSIST, orphanRemoval = true)
+	@OneToMany(mappedBy="room", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Item> items;
 	
-	@OneToMany(mappedBy="room", fetch= FetchType.EAGER)
+	@OneToMany(mappedBy="room", cascade = {CascadeType.PERSIST,CascadeType.MERGE}, fetch= FetchType.EAGER)
 	private List<Exit> exits = new ArrayList<>();
 	
-	@OneToMany(mappedBy="room")
+	@OneToMany(mappedBy="room", cascade = {CascadeType.PERSIST,CascadeType.MERGE})
 	private List<Monster> monsters;
 	
-	@OneToOne(cascade=CascadeType.ALL)
-	@JoinColumn(name="character_id")
+	@OneToOne(mappedBy="location", cascade = {CascadeType.PERSIST,CascadeType.MERGE})
 	private Character character;
 	
 	
@@ -50,20 +44,29 @@ public class GameRoom{
 	}
 	
 	/**Major GameRoom Constructor
-	 * 
-	 * @param id
+	 *
 	 * @param name
 	 * @param description
 	 * @param hasVisited
-	 * @param items
-	 * @param exits
 	 */
-	public GameRoom(String name, String description, String hasVisited, List<Item> items) {
+	public GameRoom(String name, String description, String hasVisited) {
 		super();
 		this.name = name;
 		this.description = description;
 		this.hasvisited = hasVisited;
-		this.items = items;
+	}
+	
+	/**
+	 * sets the character
+	 */
+	public void setCharacter(Character character) {
+		this.character= character;
+	}
+	/**
+	 * @returns the character
+	 */
+	public Character getCharacter() {
+		return this.character;
 	}
 	/**
 	 * @return the id
@@ -98,7 +101,7 @@ public class GameRoom{
 		return hasvisited;
 	}
 	/**
-	 * @param hasvisited the hasVisited to set
+	 *
 	 */
 	public void setHasVisited() {
 		this.hasvisited = "TRUE";
@@ -112,7 +115,9 @@ public class GameRoom{
 	 */
 	public void addItem(Item item) {
 		this.items.add(item);
+		item.setRoom(this);
 	}
+	
 	
 	/**To remove items from room
 	 * 
@@ -121,13 +126,17 @@ public class GameRoom{
 	 * void
 	 */
 	public void removeItem(Item item) {
-		for(int i = 0; i<this.items.size(); i++) {
-			Item it = items.get(i);
-			if(it.getName().equals(item.getName())) {
-				this.items.remove(it);
-			}
-		}
+		this.items.remove(item);
+		item.setRoom(null);
 	}
+//	public void removeItem(Item item) {
+//		for(int i = 0; i<this.items.size(); i++) {
+//			Item it = items.get(i);
+//			if(it.getName().equals(item.getName())) {
+//				this.items.remove(it);
+//			}
+//		}
+//	}
 	
 	/**Returns all items inside a room
 	 * 
@@ -164,11 +173,11 @@ public class GameRoom{
 		return this.exits;
 	}
 	
-	@Override
-	public String toString() {
-		return "GameRoom [id=" + id + ", name=" + name + ", description=" + description + ", hasvisited=" + hasvisited
-				+ ", items=" + items + ", character=" + character + "]";
-	}
+//	@Override
+//	public String toString() {
+//		return "GameRoom [id=" + id + ", name=" + name + ", description=" + description + ", hasvisited=" + hasvisited
+//				+ ", character=" + character.getName() + "]";
+//	}
 
 	public List<Monster> getMonsters() {
 		return monsters;

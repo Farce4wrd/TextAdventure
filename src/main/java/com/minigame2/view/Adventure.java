@@ -19,7 +19,9 @@ import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -72,11 +74,12 @@ public class Adventure extends Application {
 	private void initCommands() {
 		commandList.put("close", new Command("Close -", "Closes the program.", Platform::exit ));
 		commandList.put("help", new Command("Help -", "Display all user commands.", this::runHelp));
-		commandList.put("showexample", new Command("Show Example -", "hope this works.", this::showCommand));
-		commandList.put("seeexits", new Command("See Exits -", "Show list of exits.", this.grc::tester));
+		//commandList.put("showexample", new Command("Show Example -", "hope this works.", this::showCommand));
+		//commandList.put("seeexits", new Command("See Exits -", "Show list of exits.", this.grc::tester));
 		commandList.put("go", new Command("Go -", "Moves to EAST or WEST or NORTH or SOUTH (example: go > east).", () ->moveCommand(direction)));
 		commandList.put("pickup", new Command("Pick Up -", "Picks up any item (example: pickup > bandage).", () ->pick(pickupItem)));
 		commandList.put("drop", new Command("Drop -", "Drops any item from inventory (example: drop > bandage).", () ->drop(pickupItem)));
+		commandList.put("inspect", new Command("Inspect -", "Inspects items within a room", this::inspectItemsInRoom));
 		//Need a method to show room currently in, list of items in room, exits in the room.
 		//May also display status of character in the method above (hp, inventory, e.t.c)
 	}
@@ -93,6 +96,8 @@ public class Adventure extends Application {
 			pickupItem = query[1].toLowerCase();
 		}else if(command.equals("go")) {
 			direction = query[1].toLowerCase();
+		}else if(command.equals("drop")) {
+			pickupItem = query[1].toLowerCase();
 		}
 
 		commandList.get(command).execute();
@@ -103,12 +108,19 @@ public class Adventure extends Application {
 		output.appendText(">"+line + "\n");
 		output.setWrapText(true);
 	}
-	
-	private void showCommand()
-	{
-		String holdtheline = grc.tester();
-		println(holdtheline);
+
+	private void inspectItemsInRoom(){
+		List<String> itemsWithin = grc.inspectRoomItems(chara);
+		for(String item : itemsWithin){
+			println(item+"\n");
+		}
 	}
+	
+//	private void showCommand()
+//	{
+//		String holdtheline = grc.tester();
+//		println(holdtheline);
+//	}
 	
 	//pick up an item from room into character inventory
 	private void pick(String item) {

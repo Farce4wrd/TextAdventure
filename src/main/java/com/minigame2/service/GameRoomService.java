@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -40,6 +41,24 @@ public class GameRoomService {
 	public GameRoom addRoom(GameRoom room) {
 		return gameRoomRepository.save(room);
 	}
+
+	/**
+	 *
+	 * @param roomId
+	 * @param item
+	 * @return
+	 */
+	public Boolean dropItemInRoom(int roomId, Item item){
+		//Optional<GameRoom> room = this.gameRoomRepository.findRoomByitems(roomId);
+		GameRoom room = this.gameRoomRepository.findRoomByitems(roomId);
+		//GameRoom room = room.get();
+		room.addItem(item);
+		this.gameRoomRepository.save(room);
+		return true;
+		//return "Mission Accomplished! Room saved";
+	}
+
+
 	//retrieves rooms from the database
 	public List<GameRoom> getRooms(){
 		return this.gameRoomRepository.findAll();
@@ -59,6 +78,8 @@ public class GameRoomService {
 		return this.gameRoomRepository.findRoomByitems(id);
 	}
 	
+	//remove item from a room
+	
 
 	
 	/**Inform the user the room has been visited
@@ -70,55 +91,6 @@ public class GameRoomService {
 	public void setRoomVisited(GameRoom room) {
 		room.setHasVisited();
 	}
-	
-	/**leaves item from backpack in current room
-	 * 
-	 * Method: @param item
-	 * Method: @param room
-	 *
-	 * void
-	 */
-	public void dropItemInRoom(Item item, GameRoom room) {
-		room.addItem(item);
-	}
-	
-	/**adds an item randomly into a randomly into a room
-	 *  
-	 * Method: @param item
-	 * Method: @param room
-	 * Method: @throws GameDataException
-	 *
-	 * void
-	 */
-	public void addItemInRoom(ArrayList<Item> item, ArrayList<GameRoom> room) throws GameDataException {
-		Item item1 = item.get(0);
-		Item item2 = item.get(1);
-		Item item3 = item.get(2);
-		
-		room.get(1).addItem(item1);
-		room.get(2).addItem(item2);
-		room.get(3).addItem(item3);
-		
-	}
-	
-	/**remove item from room after player picks it up
-	 * 
-	 * Method: @param item
-	 * Method: @param room
-	 *
-	 * void
-	 */
-	public void removeItemFromRoom(Item item, GameRoom room) {
-		room.removeItem(item);
-	}
-	
-	/**gets item from specific room
-	 * 
-	 * Method: @param room
-	 * Method: @return
-	 *
-	 * ArrayList<Item>
-	 */
 
 	
 

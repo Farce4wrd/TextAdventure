@@ -1,15 +1,15 @@
 package com.minigame2.service;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.minigame2.data.ItemRepository;
 import com.minigame2.model.GameRoom;
 import com.minigame2.model.Item;
-import com.minigame2.model.Player;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 public class ItemService {
@@ -19,7 +19,7 @@ public class ItemService {
 	public ItemService(ItemRepository itemRepository) {
 		this.itemRepository = itemRepository;
 	}
-	private Player player;
+
 	
 	/**This code shows the name of the item
 	 * 
@@ -31,19 +31,28 @@ public class ItemService {
 		System.out.println(item.getItemDescription());
 	}
 	
-	/**create Items from txt file to add to a room
-	 * 
-	 * Method: @param id
-	 * Method: @param name
-	 * Method: @param description
-	 *
-	 * void
+	/**
+	 * Method: @param item
 	 */
-//	public void createItems(int id, String name, String description) {
-//		Item item = new Item(id, name, description);
-//		items.add(item);
-//		
-//	}
+	public Item addItem(Item item) {
+		return this.itemRepository.save(item);
+	}
+	
+	public Item getItem(int id) {
+		Optional<Item> itemContainer =  itemRepository.findById(id);
+		if(itemContainer.isPresent()) {
+			Item item = itemContainer.get();
+			return item;
+		}else {
+			return null;
+		}
+	}
+	
+	/**
+	 * 
+	 * @param room
+	 * @return
+	 */
 	public List<Item> getItemsById(GameRoom room){
 		return this.itemRepository.findByroom(room);
 		

@@ -1,13 +1,18 @@
 package com.minigame2.model;
 
-import javax.persistence.*;
-import java.io.Serializable;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 @Entity
-@Table(name="MONSTER", schema="MONSTER")
+@Table(name="MONSTER")
 public class Monster{
 	@Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 	private boolean isBoss;
 	private String name; 
@@ -23,7 +28,7 @@ public class Monster{
 	}
 	
 	
-	private Monster( boolean isBoss, String name, int hp, int damage) {
+	public Monster( boolean isBoss, String name, int hp, int damage) {
 		this.isBoss = isBoss;
 		this.name = name;
 		this.hp = hp;
@@ -75,7 +80,7 @@ public class Monster{
 	@Override
 	public String toString() {
 		return "Monster [id=" + id + ", isBoss=" + isBoss + ", name=" + name + ", hp=" + hp + ", damage=" + damage
-				+ ", variety=" + variety + ", room=" + room + "]";
+				+ ", variety=" + variety + ", room=" + room.getName() + "]";
 	}
 	
 	

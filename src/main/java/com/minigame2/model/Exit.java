@@ -16,10 +16,10 @@ import java.io.Serializable;
  * This class is responsible for encapsulating the room id of other room objects and directions which would be used for user options.
  */
 @Entity
-@Table(name="EXIT", schema="EXIT")
-public class Exit implements Serializable {
+@Table(name="EXIT")
+public class Exit {
 	@Id
-	@GeneratedValue(strategy= GenerationType.AUTO)
+	@GeneratedValue(strategy= GenerationType.IDENTITY)
 	private int id;
 	private int roomid;
 	private String direction;

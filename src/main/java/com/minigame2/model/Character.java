@@ -1,26 +1,33 @@
 package com.minigame2.model;
 
 
-import javax.persistence.*;
-
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 
 
 @Entity
 @Table(name="CHARACTER")
 public class Character {
 	@Id
-	@GeneratedValue(strategy= GenerationType.AUTO)
+	@GeneratedValue(strategy= GenerationType.IDENTITY)
 	private int id;
 	private String name;
 	private int hp;
 	private int life;
 	private int points;
 	private int level;
-	@OneToOne(mappedBy="character")
+	@OneToOne
+	@JoinColumn(name="room_id")
 	private GameRoom location = new GameRoom();
 	@Transient
 	private List<Item> inventory;
@@ -30,10 +37,9 @@ public class Character {
 	public Character() {
 	}
 
-	public Character(String name, GameRoom location, int hp, int life, int points, int level) {
+	public Character(String name, int hp, int life, int points, int level) {
 		lock= new ReentrantLock();
 		this.name = name;
-		this.location = location;
 		this.inventory = new ArrayList<Item>();
 		this.hp = hp; //for now...
 		this.life= life;
@@ -111,11 +117,11 @@ public class Character {
 		this.id = id;
 	}
 
-	@Override
-	public String toString() {
-		return "Character [id=" + id + ", name=" + name + ", hp=" + hp + ", life=" + life + ", points=" + points
-				+ ", level=" + level + ", location=" + location + ", inventory=" + inventory + "]";
-	}
-	
+//	@Override
+//	public String toString() {
+//		return "Character [id=" + id + ", name=" + name + ", hp=" + hp + ", life=" + life + ", points=" + points
+//				+ ", level=" + level + ", location=" + location.getName() + ", inventory=" + inventory + "]";
+//	}
+//
 	
 }

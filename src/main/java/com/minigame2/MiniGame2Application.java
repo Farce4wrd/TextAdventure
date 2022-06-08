@@ -36,7 +36,7 @@ import org.springframework.context.annotation.Bean;
 
 
 
-
+import javax.sql.DataSource;
 
 
 @SpringBootApplication
@@ -51,10 +51,9 @@ public class MiniGame2Application{
 		//ConfigurableApplicationContext context = SpringApplication.run(MiniGame2Application.class, args);
 		//GameView game = context.getBean(GameView.class);
 		//game.start();
-		
-		
-		
+
 	}
+
 	@Bean
 	CommandLineRunner commandLineRunner(ItemRepository itemRepo,GameRoomRepository roomRepo, MonsterRepository monsterRepo, CharacterRepository characterRepo) {
 		return args ->{
